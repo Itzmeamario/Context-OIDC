@@ -31,29 +31,32 @@ export default class AuthService {
       if (window.location.href.indexOf("signin-oidc") !== -1) {
         window.location.replace("/private");
       }
-      this.userManager.events.addAccessTokenExpiring(props =>
-        console.log(`Token is expiring!!!: Someprops ${props}`)
-      );
-      this.userManager.events.addAccessTokenExpired(() => {
-        console.log(`Token is expired!!!`);
-        //Delete all localstorage items that i set
-        localStorage.removeItem("id_token");
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("data");
-        localStorage.removeItem("data1");
-        localStorage.removeItem("redirectUri");
-        localStorage.removeItem("userId");
-        
-        //Remove user from storage with removeUser
-        this.removeUser();
-
-        //Redirect to home page
-        window.location.replace("/");
-        this.userManager.events.removeAccessTokenExpired(() =>
-          console.log("removed event from token is expired")
-        );
-      });
     });
+    this.userManager.events.addAccessTokenExpiring(props =>
+      console.log(`Token is expiring!!!: Someprops ${props}`)
+    );
+    this.userManager.events.addAccessTokenExpired(() => {
+      console.log(`Token is expired!!!`);
+      //Delete all localstorage items that i set
+      localStorage.removeItem("id_token");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("data");
+      localStorage.removeItem("data1");
+      localStorage.removeItem("redirectUri");
+      localStorage.removeItem("userId");
+
+      //Remove user from storage with removeUser
+      this.removeUser();
+
+      //Redirect to home page
+      window.location.replace("/");
+    });
+    this.userManager.events.removeAccessTokenExpired(() =>
+    console.log("removed event from token is expired")
+    );
+    this.userManager.events.removeAccessTokenExpiring(() =>
+    console.log(`removed event from Token is expiring`)
+    );
   }
 
   parseJwt = token => {
@@ -110,7 +113,7 @@ export default class AuthService {
     return user;
   };
 
-  rmeoveUser = async () => {
+  removeUser = async () => {
     console.log("RUNNING rmeoveUser");
     await this.userManager.removeUser();
   };

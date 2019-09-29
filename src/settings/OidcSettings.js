@@ -5,6 +5,8 @@ export const IDENTITY_CONFIG = {
   silent_redirect_uri: process.env.REACT_APP_SILENT_REDIRECT_URL,
   post_logout_redirect_uri: process.env.REACT_APP_LOGOFF_REDIRECT_URL,
   // audience: "your audience",
+  // accessTokenExpiringNotificationTime: "10",
+  // checkSessionInterval: "10",
   response_type: "id_token token",
   automaticSilentRenew: false,
   loadUserInfo: false,

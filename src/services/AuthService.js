@@ -18,6 +18,7 @@ export default class AuthService {
 
     this.accessToken = null;
     this.id_token = null;
+    this.userManager.stopSilentRenew();
     this.userManager.events.addUserLoaded(user => {
       this.accessToken = user.access_token;
       this.id_token = user.id_token;
@@ -28,8 +29,30 @@ export default class AuthService {
         idToken: user.id_token
       });
       if (window.location.href.indexOf("signin-oidc") !== -1) {
-        this.navigateToScreen();
+        window.location.replace("/private");
       }
+      this.userManager.events.addAccessTokenExpiring(props =>
+        console.log(`Token is expiring!!!: Someprops ${props}`)
+      );
+      this.userManager.events.addAccessTokenExpired(() => {
+        console.log(`Token is expired!!!`);
+        //Delete all localstorage items that i set
+        localStorage.removeItem("id_token");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("data");
+        localStorage.removeItem("data1");
+        localStorage.removeItem("redirectUri");
+        localStorage.removeItem("userId");
+        
+        //Remove user from storage with removeUser
+        this.removeUser();
+
+        //Redirect to home page
+        window.location.replace("/");
+        this.userManager.events.removeAccessTokenExpired(() =>
+          console.log("removed event from token is expired")
+        );
+      });
     });
   }
 
@@ -66,18 +89,11 @@ export default class AuthService {
   }
 
   signinRedirect = async () => {
-    console.log("RUNNING signinRedirect");
     localStorage.setItem("redirectUri", window.location.pathname);
     await this.userManager.signinRedirect();
   };
 
-  onUserLoaded = () => {
-    console.log("RUNNING onUserLoaded");
-    console.log(this.props);
-  };
-
   signinRedirectCallback = () => {
-    console.log("RUNNING signinRedirectCallback");
     this.userManager.signinRedirectCallback().then(() => {
       "";
     });
@@ -85,7 +101,6 @@ export default class AuthService {
 
   isAuthenticated = () => {
     const id_token = localStorage.getItem("id_token");
-    console.log(!!id_token);
     return !!id_token;
   };
 
@@ -95,7 +110,8 @@ export default class AuthService {
     return user;
   };
 
-  navigateToScreen = () => {
-    window.location.replace("/private");
+  rmeoveUser = async () => {
+    console.log("RUNNING rmeoveUser");
+    await this.userManager.removeUser();
   };
 }

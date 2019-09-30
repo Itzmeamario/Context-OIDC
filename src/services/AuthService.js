@@ -28,12 +28,17 @@ export default class AuthService {
         accessToken: this.accessToken,
         idToken: user.id_token
       });
+      // when it's not pop up mode
       if (window.location.href.indexOf("signin-oidc") !== -1) {
         window.location.replace("/private");
       }
+      // when it's popup mode
+      if (!!localStorage.getItem("id_token")) {
+        window.location.reload();
+      }
     });
-    this.userManager.events.addAccessTokenExpiring(props =>
-      console.log(`Token is expiring!!!: Someprops ${props}`)
+    this.userManager.events.addAccessTokenExpiring(() =>
+      console.log(`Token is expiring!!!`)
     );
     this.userManager.events.addAccessTokenExpired(() => {
       console.log(`Token is expired!!!`);
@@ -49,13 +54,13 @@ export default class AuthService {
       this.removeUser();
 
       //Redirect to home page
-      window.location.replace("/");
+      // window.location.replace("/");
     });
     this.userManager.events.removeAccessTokenExpired(() =>
-    console.log("removed event from token is expired")
+      console.log("removed event from token is expired")
     );
     this.userManager.events.removeAccessTokenExpiring(() =>
-    console.log(`removed event from Token is expiring`)
+      console.log(`removed event from Token is expiring`)
     );
   }
 
@@ -91,15 +96,24 @@ export default class AuthService {
     localStorage.setItem("id_token", authResult.idToken);
   }
 
-  signinRedirect = async () => {
+  signinRedirect = () => {
     localStorage.setItem("redirectUri", window.location.pathname);
-    await this.userManager.signinRedirect();
+    this.userManager.signinRedirect();
   };
 
   signinRedirectCallback = () => {
     this.userManager.signinRedirectCallback().then(() => {
       "";
     });
+  };
+
+  signinPopup = async () => {
+    localStorage.setItem("redirectUriPop", window.location.pathname);
+    await this.userManager.signinPopup();
+  };
+
+  signinPopupCallback = () => {
+    this.userManager.signinPopupCallback();
   };
 
   isAuthenticated = () => {

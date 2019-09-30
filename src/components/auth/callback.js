@@ -3,8 +3,9 @@ import { AuthConsumer } from "../../context/authContext/authProvider";
 
 export const Callback = () => (
   <AuthConsumer>
-    {({ signinRedirectCallback }) => {
-      signinRedirectCallback();
+    {({ signinRedirectCallback, signinPopupCallback }) => {
+      // signinRedirectCallback();
+      signinPopupCallback();
       return <h1>LOADING!!!...</h1>;
     }}
   </AuthConsumer>

@@ -2,12 +2,14 @@ import { combineReducers } from "redux";
 import { USER_UPDATED } from "./actions";
 
 const userReducer = (state = null, action) => {
-  if(action.type === USER_UPDATED) {
-    return action.payload
+  switch (action.type) {
+    case USER_UPDATED:
+      return action.payload;
+    default:
+      return state;
   }
-  return state;
-}
+};
 
 export default combineReducers({
   user: userReducer
-})
+});

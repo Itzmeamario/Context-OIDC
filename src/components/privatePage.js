@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { authService } from "../services/AuthService";
 
 export class PrivatePage extends Component {
   constructor(props) {
@@ -9,14 +10,15 @@ export class PrivatePage extends Component {
   }
 
   componentDidMount = async () => {
-    const user = await this.props.getUser();
-    this.setState({user})
-  }
+    const user = await authService.getUser();
+    this.setState({ user });
+  };
 
   render() {
     return (
       <h1>
-        HI! {JSON.stringify(this.state.user)}
+
+        {JSON.stringify(this.state.user)}
       </h1>
     );
   }

@@ -2,8 +2,7 @@ import { UserManager, WebStorageStateStore } from "oidc-client";
 import { IDENTITY_CONFIG } from "../settings/OidcSettings";
 
 // import { Log } from "oidc-client";
-
-export default class AuthService {
+class AuthService {
   constructor() {
     console.log("Loading auth service");
     this.userManager = new UserManager({
@@ -18,50 +17,10 @@ export default class AuthService {
 
     this.accessToken = null;
     this.id_token = null;
-    this.userManager.stopSilentRenew();
-    this.userManager.events.addUserLoaded(user => {
-      this.accessToken = user.access_token;
-      this.id_token = user.id_token;
-      localStorage.setItem("access_token", user.access_token);
-      localStorage.setItem("id_token", user.id_token);
-      this.setUserInfo({
-        accessToken: this.accessToken,
-        idToken: user.id_token
-      });
-      // when it's not pop up mode
-      if (window.location.href.indexOf("signin-oidc") !== -1) {
-        window.location.replace("/private");
-      }
-      // when it's popup mode
-      if (!!localStorage.getItem("id_token")) {
-        window.location.reload();
-      }
-    });
-    this.userManager.events.addAccessTokenExpiring(() =>
-      console.log(`Token is expiring!!!`)
-    );
-    this.userManager.events.addAccessTokenExpired(() => {
-      console.log(`Token is expired!!!`);
-      //Delete all localstorage items that i set
-      localStorage.removeItem("id_token");
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("data");
-      localStorage.removeItem("data1");
-      localStorage.removeItem("redirectUri");
-      localStorage.removeItem("userId");
 
-      //Remove user from storage with removeUser
-      this.removeUser();
-
-      //Redirect to home page
-      // window.location.replace("/");
-    });
-    this.userManager.events.removeAccessTokenExpired(() =>
-      console.log("removed event from token is expired")
-    );
-    this.userManager.events.removeAccessTokenExpiring(() =>
-      console.log(`removed event from Token is expiring`)
-    );
+    //Redirect to home page
+    // window.location.replace("/");
+    // });
   }
 
   parseJwt = token => {
@@ -71,24 +30,39 @@ export default class AuthService {
   };
 
   setUserInfo = authResult => {
-    const data = this.parseJwt(this.accessToken);
-    const data1 = this.parseJwt(this.id_token);
-
-    console.log({ data });
-    console.log({ data1 });
+    const accessData = this.parseJwt(this.accessToken);
+    const idData = this.parseJwt(this.id_token);
 
     this.setSessionInfo(authResult);
-    this.setUser(data);
-    this.setUser1(data1);
+    this.setUser(accessData);
+    this.setAccessData(accessData);
+    this.setIdData(idData);
+  };
+
+  addUserLoaded = () => {
+    this.userManager.events.addUserLoaded(user => {
+      console.log("LOADED USER in APP");
+      this.accessToken = user.access_token;
+      this.id_token = user.id_token;
+      localStorage.setItem("access_token", user.access_token);
+      localStorage.setItem("id_token", user.id_token);
+      this.setUserInfo({
+        accessToken: this.accessToken,
+        idToken: user.id_token
+      });
+    });
   };
 
   setUser = data => {
     localStorage.setItem("userId", data.sub);
-    localStorage.setItem("data", JSON.stringify(data));
   };
 
-  setUser1 = data => {
-    localStorage.setItem("data1", JSON.stringify(data));
+  setAccessData = data => {
+    localStorage.setItem("accessData", JSON.stringify(data));
+  };
+
+  setIdData = data => {
+    localStorage.setItem("idData", JSON.stringify(data));
   };
 
   setSessionInfo(authResult) {
@@ -96,24 +70,60 @@ export default class AuthService {
     localStorage.setItem("id_token", authResult.idToken);
   }
 
-  signinRedirect = () => {
-    localStorage.setItem("redirectUri", window.location.pathname);
-    this.userManager.signinRedirect();
+  addAccessTokenExpiring = () => {
+    this.userManager.events.addAccessTokenExpiring(() =>
+      console.log(`Token is expiring!!!`)
+    );
   };
-
-  signinRedirectCallback = () => {
-    this.userManager.signinRedirectCallback().then(() => {
-      "";
+  
+  addAccessTokenExpired = () => {
+    this.userManager.events.addAccessTokenExpired(() => {
+      console.log(`Token is expired!!!`);
+      this.storageCleanUp();
+      // window.location.reload();
     });
   };
-
-  signinPopup = async () => {
-    localStorage.setItem("redirectUriPop", window.location.pathname);
-    await this.userManager.signinPopup();
+  
+  removeAccessTokenExpired = () => {
+    this.userManager.events.removeAccessTokenExpired(() =>
+    console.log("removed event from token is expired")
+    );
   };
-
+  
+  removeAccessTokenExpiring = () => {
+    this.userManager.events.removeAccessTokenExpiring(() =>
+    console.log(`removed event from Token is expiring`)
+    );
+  };
+  
+  signinPopup = () => {
+    localStorage.setItem("redirectUriPop", window.location.pathname);
+    this.userManager.signinPopup();
+  };
+  
   signinPopupCallback = () => {
     this.userManager.signinPopupCallback();
+  };
+  
+  signoutPopup = () => {
+    this.storageCleanUp();
+    console.log("SignoutPopup being called");
+    this.userManager.signoutPopup();
+  };
+
+  signoutPopupCallback = () => {
+    this.userManager.signoutPopupCallback();
+  };
+
+  storageCleanUp = () => {
+    localStorage.removeItem("redirectUriPop");
+    localStorage.removeItem("id_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("accessData");
+    localStorage.removeItem("idData");
+    localStorage.removeItem("userId");
+
+    this.removeUser();
   };
 
   isAuthenticated = () => {
@@ -127,8 +137,11 @@ export default class AuthService {
     return user;
   };
 
+  // Not being used
   removeUser = async () => {
-    console.log("RUNNING rmeoveUser");
+    console.log("RUNNING removeUser");
     await this.userManager.removeUser();
   };
 }
+
+export const authService = new AuthService();

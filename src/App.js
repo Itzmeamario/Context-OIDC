@@ -1,21 +1,28 @@
 import React, { Component } from "react";
 import OidcRoutes from "./routes/routes";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "./context/authContext/authProvider";
 import { HeaderButtons } from "./components/header/headerButtons";
+import { authService } from "./services/AuthService";
 
 export default class App extends Component {
+  componentDidMount =  async () => {
+    console.log("Rendering APP")
+    if (await authService.getUser()) {
+      authService.removeAccessTokenExpiring();
+      authService.removeAccessTokenExpired();
+    } else {
+      authService.addUserLoaded();
+      authService.addAccessTokenExpiring();
+      authService.addAccessTokenExpired();
+    }
+  }
   render() {
-    console.log("Rerendering");
     return (
       <div>
-        HI FML
-        <AuthProvider>
-          <BrowserRouter>
-            <HeaderButtons />
-            <OidcRoutes />
-          </BrowserRouter>
-        </AuthProvider>
+        <BrowserRouter>
+          <HeaderButtons />
+          <OidcRoutes />
+        </BrowserRouter>
       </div>
     );
   }

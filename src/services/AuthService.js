@@ -39,7 +39,7 @@ class AuthService {
     this.setIdData(idData);
   };
 
-  addUserLoaded = () => {
+  addUserLoaded = updateUser => {
     this.userManager.events.addUserLoaded(user => {
       console.log("LOADED USER in APP");
       this.accessToken = user.access_token;
@@ -50,6 +50,7 @@ class AuthService {
         accessToken: this.accessToken,
         idToken: user.id_token
       });
+      updateUser(user);
     });
   };
 
@@ -75,43 +76,48 @@ class AuthService {
       console.log(`Token is expiring!!!`)
     );
   };
-  
-  addAccessTokenExpired = () => {
+
+  addAccessTokenExpired = updateUser => {
     this.userManager.events.addAccessTokenExpired(() => {
       console.log(`Token is expired!!!`);
       this.storageCleanUp();
+      this.removeUser(updateUser);
       // window.location.reload();
     });
   };
-  
+
   removeAccessTokenExpired = () => {
     this.userManager.events.removeAccessTokenExpired(() =>
-    console.log("removed event from token is expired")
+      console.log("removed event from token is expired")
     );
   };
-  
+
   removeAccessTokenExpiring = () => {
     this.userManager.events.removeAccessTokenExpiring(() =>
-    console.log(`removed event from Token is expiring`)
+      console.log(`removed event from Token is expiring`)
     );
   };
-  
+
   signinPopup = () => {
     localStorage.setItem("redirectUriPop", window.location.pathname);
     this.userManager.signinPopup();
   };
-  
+
   signinPopupCallback = () => {
     this.userManager.signinPopupCallback();
   };
-  
-  signoutPopup = () => {
-    this.storageCleanUp();
-    console.log("SignoutPopup being called");
-    this.userManager.signoutPopup();
-  };
 
-  signoutPopupCallback = () => {
+  signoutPopup = updateUser => {
+    // this.removeUser(updateUser);
+    console.log("SignoutPopup being called");
+    this.userManager
+    .signoutPopup()
+    .then(() => this.signoutPopupCallback(updateUser));
+  };
+  
+  signoutPopupCallback = updateUser => {
+    this.storageCleanUp();
+    this.removeUser(updateUser);
     this.userManager.signoutPopupCallback();
   };
 
@@ -122,8 +128,6 @@ class AuthService {
     localStorage.removeItem("accessData");
     localStorage.removeItem("idData");
     localStorage.removeItem("userId");
-
-    this.removeUser();
   };
 
   isAuthenticated = () => {
@@ -138,9 +142,10 @@ class AuthService {
   };
 
   // Not being used
-  removeUser = async () => {
+  removeUser = async updateUser => {
     console.log("RUNNING removeUser");
     await this.userManager.removeUser();
+    updateUser(null);
   };
 }
 

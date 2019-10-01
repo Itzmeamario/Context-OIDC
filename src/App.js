@@ -3,17 +3,21 @@ import OidcRoutes from "./routes/routes";
 import { BrowserRouter } from "react-router-dom";
 import { HeaderButtons } from "./components/header/headerButtons";
 import { authService } from "./services/AuthService";
+import { updateUser } from "./redux/actionCreators"
+import { connect } from "react-redux";
 
-export default class App extends Component {
+
+class AppController extends Component {
   componentDidMount =  async () => {
     console.log("Rendering APP")
     if (await authService.getUser()) {
       authService.removeAccessTokenExpiring();
       authService.removeAccessTokenExpired();
     } else {
-      authService.addUserLoaded();
+      const { updateUser } = this.props;
+      authService.addUserLoaded(updateUser);
       authService.addAccessTokenExpiring();
-      authService.addAccessTokenExpired();
+      authService.addAccessTokenExpired(updateUser);
     }
   }
   render() {
@@ -27,3 +31,6 @@ export default class App extends Component {
     );
   }
 }
+
+
+export default connect(null, { updateUser })(AppController)

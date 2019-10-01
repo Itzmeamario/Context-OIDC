@@ -1,25 +1,8 @@
-import React, { Component } from "react";
-import { authService } from "../services/AuthService";
+import React from "react";
+import { connect } from "react-redux";
 
-export class PrivatePage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: null
-    };
+export const PrivatePage = connect(state => ({ user: state.user }))(
+  ({ user }) => {
+    return <h1>{JSON.stringify(user)}</h1>;
   }
-
-  componentDidMount = async () => {
-    const user = await authService.getUser();
-    this.setState({ user });
-  };
-
-  render() {
-    return (
-      <h1>
-
-        {JSON.stringify(this.state.user)}
-      </h1>
-    );
-  }
-}
+);

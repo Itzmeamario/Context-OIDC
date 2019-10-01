@@ -8,5 +8,5 @@ export const IDENTITY_CONFIG = {
   monitorSession: false,
   response_type: "id_token token",
   loadUserInfo: false,
-  scope: "openid profile hc-rules email"
+  scope: "openid profile email hc-rules"
 };

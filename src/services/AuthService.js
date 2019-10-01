@@ -82,7 +82,6 @@ class AuthService {
       console.log(`Token is expired!!!`);
       this.storageCleanUp();
       this.removeUser(updateUser);
-      // window.location.reload();
     });
   };
 
@@ -108,7 +107,6 @@ class AuthService {
   };
 
   signoutPopup = updateUser => {
-    // this.removeUser(updateUser);
     console.log("SignoutPopup being called");
     this.userManager
     .signoutPopup()
@@ -141,7 +139,6 @@ class AuthService {
     return user;
   };
 
-  // Not being used
   removeUser = async updateUser => {
     console.log("RUNNING removeUser");
     await this.userManager.removeUser();

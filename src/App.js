@@ -24,11 +24,7 @@ class AppController extends Component {
       console.log("Adding events");
       authService.addAccessTokenExpiring();
       authService.addAccessTokenExpired(updateUser);
-      // authService.removeUserLoaded();
     }
-    // if (!user && !loading) {
-    //   console.log("Starting to remove stuff");
-    // }
     return (
       <div>
         <BrowserRouter>

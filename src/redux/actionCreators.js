@@ -1,7 +1,7 @@
 import {
   USER_UPDATED,
   GET_USER,
-  // GET_USER_SUCCESS,
+  UPDATE_LOADING,
   GET_USER_ERROR
 } from "./actions";
 import { authService } from "../services/AuthService";
@@ -21,12 +21,12 @@ export const getUser = () => {
   };
 };
 
-// export const getUserSuccess = user => {
-//   return {
-//     type: GET_USER_SUCCESS,
-//     payload: user
-//   };
-// };
+export const updateLoading = loading => {
+  return {
+    type: UPDATE_LOADING,
+    loading
+  };
+};
 
 export const getUserError = e => {
   return {
@@ -37,7 +37,7 @@ export const getUserError = e => {
 
 export const asyncUpdateUser = user => dispatch => {
   if (user) {
-    // set loading to false , since it's no longer loading
+    dispatch(updateUser(false));
   } else {
     dispatch(getUser());
     authService.getUser()

@@ -1,20 +1,28 @@
 import React from "react";
-import { Route } from "react-router-dom";
-// import { AuthConsumer } from "../context/authContext/authProvider";
-import { authService } from "../services/AuthService";
+import { Route, Redirect } from "react-router-dom";
+// import { authService } from "../services/AuthService";
+import { connect } from "react-redux";
 
-export const PrivateRoute = ({ component: Component, ...rest }) => {
+export const PrivateRoute = connect(state => ({
+  user: state.user,
+  loading: state.loading
+}))(({ component: Component, user, loading, ...rest }) => {
   return (
     <Route
       {...rest}
       render={props => {
-        if (!!Component && authService.isAuthenticated()) {
+        // this will have to validate the id_token having an array called roles
+        // with admin in it
+        if (!!Component && user && user.id_token) {
           return <Component {...props} />;
         } else {
-          window.location.replace("/");
-          return <span>loading</span>;
+          if (loading) {
+            return <span>loading</span>;
+          } else {
+            return <Redirect to="/" />
+          }
         }
       }}
     ></Route>
   );
-};
+});

@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import {
   USER_UPDATED,
   GET_USER,
-  // GET_USER_SUCCESS,
+  UPDATE_LOADING,
   GET_USER_ERROR
 } from "./actions";
 
@@ -22,6 +22,8 @@ const loading = (state = true, action) => {
     case USER_UPDATED:
     case GET_USER_ERROR:
       return false;
+    case UPDATE_LOADING:
+      return action.loading
     default:
       return state;
   }

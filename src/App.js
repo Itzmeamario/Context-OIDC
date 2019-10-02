@@ -13,17 +13,18 @@ class AppController extends Component {
     asyncUpdateUser();
   };
   render() {
-    const { user, loading } = this.props;
+    const { user, loading, updateUser } = this.props;
     console.log({loading})
     console.log("User in", { user });
     if (user) {
+      console.log("Adding events")
       authService.addAccessTokenExpiring();
       authService.addAccessTokenExpired(updateUser);
     } else {
-      const { updateUser } = this.props;
-      authService.addUserLoaded(updateUser);
+      console.log("Starting to remove stuff")
       authService.removeAccessTokenExpiring();
       authService.removeAccessTokenExpired();
+      authService.addUserLoaded(updateUser);
     }
     return (
       <div>

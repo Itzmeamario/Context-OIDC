@@ -13,13 +13,22 @@ export const PrivateRoute = connect(state => ({
       render={props => {
         // this will have to validate the id_token having an array called roles
         // with admin in it
-        if (!!Component && user && user.id_token && user.profile && user.profile.roles === "admin") {
-          return <Component {...props} />;
+
+        if (loading) {
+          console.log("loading")
+          return <span>loading</span>;
         } else {
-          if (loading) {
-            return <span>loading</span>;
+          if (
+            !!Component &&
+            user &&
+            user.id_token &&
+            user.profile &&
+            user.profile.roles &&
+            user.profile.roles === "admin"
+          ) {
+            return <Component {...props} />;
           } else {
-            return <Redirect to="/" />
+            return <div>NO PERMS LOG IN</div>;
           }
         }
       }}

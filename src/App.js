@@ -18,10 +18,8 @@ class AppController extends Component {
 
   render() {
     const { user, loading, updateUser } = this.props;
-    console.log({ loading });
-    console.log("User in", { user });
+    console.log("User", { user });
     if (user && !loading) {
-      console.log("Adding events");
       authService.addAccessTokenExpiring();
       authService.addAccessTokenExpired(updateUser);
     }

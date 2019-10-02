@@ -31,7 +31,6 @@ class AuthService {
 
   addUserLoaded = updateUser => {
     this.userManager.events.addUserLoaded(user => {
-      console.log("LOADED USER in APP", JSON.stringify(user));
       localStorage.setItem("id_token", user.id_token);
       this.setUserInfo(user.id_token);
       updateUser(user);
@@ -89,9 +88,7 @@ class AuthService {
   storageCleanUp = () => {
     localStorage.removeItem("redirectUriPop");
     localStorage.removeItem("id_token");
-    localStorage.removeItem("accessData");
     localStorage.removeItem("idData");
-    localStorage.removeItem("userId");
   };
 
   isAuthenticated = () => {
@@ -100,13 +97,11 @@ class AuthService {
   };
 
   getUser = async () => {
-    console.log("RUNNING getUser");
     const user = await this.userManager.getUser();
     return user;
   };
 
   removeUser = async updateUser => {
-    console.log("RUNNING removeUser");
     await this.userManager.removeUser();
     updateUser(null);
   };

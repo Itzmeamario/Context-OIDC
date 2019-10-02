@@ -7,25 +7,28 @@ import { updateUser, asyncUpdateUser } from "./redux/actionCreators";
 import { connect } from "react-redux";
 
 class AppController extends Component {
-  componentDidMount = async () => {
+  componentDidMount = () => {
     console.log("Rendering APP");
-    const { asyncUpdateUser } = this.props;
+    const { asyncUpdateUser, updateUser } = this.props;
     asyncUpdateUser();
+    authService.addUserLoaded(updateUser);
+    authService.removeAccessTokenExpiring();
+    authService.removeAccessTokenExpired();
   };
+
   render() {
     const { user, loading, updateUser } = this.props;
-    console.log({loading})
+    console.log({ loading });
     console.log("User in", { user });
-    if (user) {
-      console.log("Adding events")
+    if (user && !loading) {
+      console.log("Adding events");
       authService.addAccessTokenExpiring();
       authService.addAccessTokenExpired(updateUser);
-    } else {
-      console.log("Starting to remove stuff")
-      authService.removeAccessTokenExpiring();
-      authService.removeAccessTokenExpired();
-      authService.addUserLoaded(updateUser);
+      // authService.removeUserLoaded();
     }
+    // if (!user && !loading) {
+    //   console.log("Starting to remove stuff");
+    // }
     return (
       <div>
         <BrowserRouter>

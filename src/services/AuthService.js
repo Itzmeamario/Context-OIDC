@@ -40,8 +40,9 @@ class AuthService {
   };
 
   addUserLoaded = updateUser => {
+    console.log("Called addUserLoaded")
     this.userManager.events.addUserLoaded(user => {
-      console.log("LOADED USER in APP");
+      console.log("LOADED USER in APP", JSON.stringify(user));
       this.accessToken = user.access_token;
       this.id_token = user.id_token;
       localStorage.setItem("access_token", user.access_token);
@@ -52,6 +53,12 @@ class AuthService {
       });
       updateUser(user);
     });
+  };
+
+  removeUserLoaded = () => {
+    console.log("called removeUserLoaded")
+    this.userManager.events
+      .removeUserLoaded();
   };
 
   setUser = data => {
@@ -109,14 +116,14 @@ class AuthService {
   signoutPopup = updateUser => {
     console.log("SignoutPopup being called");
     this.userManager
-    .signoutPopup()
-    .then(() => this.signoutPopupCallback(updateUser));
+      .signoutPopup()
+      .then(() => this.signoutPopupCallback(updateUser));
   };
-  
-  signoutPopupCallback = updateUser => {
+
+  signoutPopupCallback = async updateUser => {
     this.storageCleanUp();
     this.removeUser(updateUser);
-    this.userManager.signoutPopupCallback();
+    await this.userManager.signoutPopupCallback();
   };
 
   storageCleanUp = () => {

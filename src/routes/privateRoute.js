@@ -13,7 +13,7 @@ export const PrivateRoute = connect(state => ({
       render={props => {
         // this will have to validate the id_token having an array called roles
         // with admin in it
-        if (!!Component && user && user.id_token) {
+        if (!!Component && user && user.id_token && user.profile && user.profile.roles === "admin") {
           return <Component {...props} />;
         } else {
           if (loading) {

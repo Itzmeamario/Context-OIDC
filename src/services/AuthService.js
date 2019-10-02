@@ -12,6 +12,8 @@ class AuthService {
       })
     });
 
+    this.token = null;
+
     Log.logger = console;
     Log.level = Log.DEBUG;
   }
@@ -24,7 +26,6 @@ class AuthService {
 
   setUserInfo = id_token => {
     const idData = this.parseJwt(id_token);
-
     this.setIdData(idData);
   };
 
@@ -32,9 +33,7 @@ class AuthService {
     this.userManager.events.addUserLoaded(user => {
       console.log("LOADED USER in APP", JSON.stringify(user));
       localStorage.setItem("id_token", user.id_token);
-      this.setUserInfo({
-        idToken: user.id_token
-      });
+      this.setUserInfo(user.id_token);
       updateUser(user);
     });
   };
@@ -48,14 +47,11 @@ class AuthService {
   }
 
   addAccessTokenExpiring = () => {
-    this.userManager.events.addAccessTokenExpiring(() =>
-      console.log(`Token is expiring!!!`)
-    );
+    this.userManager.events.addAccessTokenExpiring();
   };
 
   addAccessTokenExpired = updateUser => {
     this.userManager.events.addAccessTokenExpired(() => {
-      console.log(`Token is expired!!!`);
       this.storageCleanUp();
       this.removeUser(updateUser);
     });

@@ -46,7 +46,9 @@ class AuthService {
   }
 
   addAccessTokenExpiring = () => {
-    this.userManager.events.addAccessTokenExpiring();
+    this.userManager.events.addAccessTokenExpiring(async () => {
+      await this.signinSilent();
+    });
   };
 
   addAccessTokenExpired = updateUser => {
@@ -64,6 +66,19 @@ class AuthService {
     this.userManager.events.removeAccessTokenExpiring();
   };
 
+  signinSilent = async () => {
+    console.log("CALLING MY SILENT IMPLEMENTATION");
+    await this.userManager.signinSilent({
+      response_type: "id_token token",
+      scope: "openid profile email hc-rules"
+    });
+  };
+
+  signinSilentCallback = () => {
+    console.log("Calling S callback");
+    this.userManager.signinSilentCallback();
+  };
+  
   signinPopup = async () => {
     localStorage.setItem("redirectUriPop", window.location.pathname);
     await this.userManager.signinPopup({

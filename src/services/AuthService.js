@@ -66,8 +66,7 @@ class AuthService {
 
   signinPopup = async () => {
     localStorage.setItem("redirectUriPop", window.location.pathname);
-    await this.userManager.signinPopup(
-      {
+    await this.userManager.signinPopup({
       acr_values: "passport_social",
 
       extraQueryParams: {
@@ -75,8 +74,7 @@ class AuthService {
         redirectUri:
           "https://dev.idp.hyrecar.com/identity/authentication/getauthcode"
       }
-    }
-    );
+    });
   };
 
   signinPopupCallback = () => {

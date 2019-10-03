@@ -64,9 +64,19 @@ class AuthService {
     this.userManager.events.removeAccessTokenExpiring();
   };
 
-  signinPopup = () => {
+  signinPopup = async () => {
     localStorage.setItem("redirectUriPop", window.location.pathname);
-    this.userManager.signinPopup();
+    await this.userManager.signinPopup(
+      {
+      acr_values: "passport_social",
+
+      extraQueryParams: {
+        preselectedExternalProvider: "ewogICAicHJvdmlkZXIiIDogImdvb2dsZSIKfQ==",
+        redirectUri:
+          "https://dev.idp.hyrecar.com/identity/authentication/getauthcode"
+      }
+    }
+    );
   };
 
   signinPopupCallback = () => {
